@@ -23,6 +23,10 @@ ADronePawn::ADronePawn()
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
+	bUseControllerRotationYaw = true;
+    bUseControllerRotationPitch = true;
+    bUseControllerRotationRoll = false;
+
 }
 
 // Called when the game starts or when spawned
@@ -68,17 +72,32 @@ void ADronePawn::Shoot()
 
 void ADronePawn::MoveForward(float Value)
 {
-	AddMovementInput(GetActorForwardVector(), Value);
+    if (Controller && Value != 0.f)
+    {
+        FRotator ControlRotation = Controller->GetControlRotation();
+        ControlRotation.Pitch = 0.f; // не нахиляємось вниз
+        FVector Direction = FRotationMatrix(ControlRotation).GetScaledAxis(EAxis::X);
+        AddMovementInput(Direction, Value);
+    }
 }
 
 void ADronePawn::MoveRight(float Value)
 {
-	AddMovementInput(GetActorRightVector(), Value);
+    if (Controller && Value != 0.f)
+    {
+        FRotator ControlRotation = Controller->GetControlRotation();
+        ControlRotation.Pitch = 0.f;
+        FVector Direction = FRotationMatrix(ControlRotation).GetScaledAxis(EAxis::Y);
+        AddMovementInput(Direction, Value);
+    }
 }
 
 void ADronePawn::MoveUp(float Value)
 {
-	AddMovementInput(GetActorUpVector(), Value);
+    if (Value != 0.f)
+    {
+        AddMovementInput(FVector::UpVector, Value);
+    }
 }
 
 void ADronePawn::Turn(float Value)
@@ -88,5 +107,12 @@ void ADronePawn::Turn(float Value)
 
 void ADronePawn::LookUp(float Value)
 {
-	AddControllerPitchInput(Value);
+    if (Controller)
+    {
+        FRotator Rotation = Controller->GetControlRotation();
+        float CurrentPitch = FRotator::NormalizeAxis(Rotation.Pitch);
+        float NewPitch = FMath::Clamp(CurrentPitch + Value, -80.f, -70.f);
+        Rotation.Pitch = NewPitch;
+        Controller->SetControlRotation(Rotation);
+    }
 }
