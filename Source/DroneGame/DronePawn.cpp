@@ -2,9 +2,11 @@
 
 
 #include "DronePawn.h"
+#include "Projectile.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Components/InputComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ADronePawn::ADronePawn()
@@ -47,6 +49,21 @@ void ADronePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	PlayerInputComponent->BindAxis("Turn", this, &ADronePawn::Turn);
 	PlayerInputComponent->BindAxis("LookUp", this, &ADronePawn::LookUp);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ADronePawn::Shoot);
+}
+
+void ADronePawn::Shoot()
+{
+	if (!ProjectileClass) return;
+
+	FVector SpawnLocation = CameraComponent->GetComponentLocation() + CameraComponent->GetForwardVector() * 100.0f;
+	FRotator SpawnRotation = CameraComponent->GetComponentRotation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+
+	GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
 }
 
 void ADronePawn::MoveForward(float Value)

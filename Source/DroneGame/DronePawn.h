@@ -6,6 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "DronePawn.generated.h"
 
+class AProjectile;
+
 UCLASS()
 class DRONEGAME_API ADronePawn : public APawn
 {
@@ -32,6 +34,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	class UFloatingPawnMovement* MovementComponent;
+
+	UPROPERTY(EditAnywhere, Category = "Shooting")
+	TSubclassOf<AProjectile> ProjectileClass;
+
+	UFUNCTION()
+	void Shoot();
 
 	void MoveForward(float value);
 	void MoveRight(float value);
