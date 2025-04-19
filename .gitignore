@@ -1,0 +1,27 @@
+
+# System
+.vscode/
+.idea/
+*.sln
+*.VC.db
+*.opensdf
+*.suo
+*.user
+*.log
+*.tlog
+*.ipch
+*.db
+*.tmp
+*.obj
+
+# Unreal Engine
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+Build/
+*.xcodeproj
+
+# MacOS
+.DS_Store
