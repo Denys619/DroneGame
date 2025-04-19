@@ -20,7 +20,7 @@ ATurrets::ATurrets()
 
 	DetectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DetectionSphere"));
 	DetectionSphere->SetupAttachment(RootComponent);
-	DetectionSphere->SetSphereRadius(600.f);
+	DetectionSphere->SetSphereRadius(1200.f);
 
 }
 
