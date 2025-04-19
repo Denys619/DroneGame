@@ -23,10 +23,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-private:
+protected:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* MeshComponent;
 
 	UPROPERTY(VisibleAnywhere)
 	class UProjectileMovementComponent* MovementComponent;
+
+public:
+	FORCEINLINE UProjectileMovementComponent* GetMovementComponent() const { return MovementComponent; }
 };
