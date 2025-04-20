@@ -66,3 +66,11 @@ void AProjectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 
     Destroy();
 }
+
+void AProjectile::SetGravityEnabled(bool bEnableGravity)
+{
+	if (MovementComponent)
+	{
+		MovementComponent->ProjectileGravityScale = bEnableGravity ? 0.5f : 0.0f;
+	}
+}

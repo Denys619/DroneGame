@@ -142,16 +142,21 @@ void ADronePawn::Shoot()
 {
     if (!ProjectileClass || !bCanShoot || CurrentAmmo <= 0) return;
 
-    bCanShoot = false;
-    --CurrentAmmo;
-
     FVector SpawnLocation = CameraComponent->GetComponentLocation() + CameraComponent->GetForwardVector() * 100.0f;
     FRotator SpawnRotation = CameraComponent->GetComponentRotation();
 
     FActorSpawnParameters SpawnParams;
     SpawnParams.Owner = this;
 
-    GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+    if (Projectile)
+    {
+        Projectile->SetGravityEnabled(true);
+    }
+
+	bCanShoot = false;
+    --CurrentAmmo;
+
 
     GetWorldTimerManager().SetTimer(FireCooldownTimer, this, &ADronePawn::ResetShoot, FireCooldown, false);
 }
