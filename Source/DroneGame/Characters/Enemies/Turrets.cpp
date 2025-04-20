@@ -4,6 +4,7 @@
 #include "Turrets.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "../../Components/HealthComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -37,6 +38,13 @@ void ATurrets::BeginPlay()
 		HealthComponent->OnDeath.AddDynamic(this, &ATurrets::HandleDeath);
 	}
 	
+	if (UStaticMeshComponent* FoundMesh = Cast<UStaticMeshComponent>(GetDefaultSubobjectByName(TEXT("TurretMesh"))))
+	{
+		DynamicMaterial = UMaterialInstanceDynamic::Create(FoundMesh->GetMaterial(0), this);
+		FoundMesh->SetMaterial(0, DynamicMaterial);
+		OriginalColor = DynamicMaterial->K2_GetVectorParameterValue(FName("BaseColor"));
+	}
+
 	TargetActor = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
 	GetWorldTimerManager().SetTimer(ShootingTimer, this, &ATurrets::ShootAtTarget, FireRate, true);
@@ -85,6 +93,21 @@ void ATurrets::ShootAtTarget()
 			Projectile->GetMovementComponent()->Velocity = Direction * 1000.f;
 		}
 	}
+}
+
+void ATurrets::FlashOnHit()
+{
+	if (!DynamicMaterial) return;
+
+	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), FLinearColor::Red);
+
+	GetWorldTimerManager().SetTimer(FlashTimer, [this]()
+	{
+		if (DynamicMaterial)
+		{
+			DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), OriginalColor);
+		}
+	}, 0.15f, false);
 }
 
 void ATurrets::HandleDeath()
