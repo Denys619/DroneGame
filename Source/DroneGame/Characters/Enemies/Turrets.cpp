@@ -21,7 +21,7 @@ ATurrets::ATurrets()
 
 	DetectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DetectionSphere"));
 	DetectionSphere->SetupAttachment(RootComponent);
-	DetectionSphere->SetSphereRadius(1200.f);
+	DetectionSphere->SetSphereRadius(2000.f);
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
