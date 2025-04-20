@@ -42,6 +42,8 @@ void ADronePawn::BeginPlay()
 {
 	Super::BeginPlay();
 
+	CurrentAmmo = MaxAmmo;
+
 	if (HealthComponent)
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &ADronePawn::HandleDeath);
@@ -129,15 +131,25 @@ void ADronePawn::LookUp(float Value)
 // === Shooting ===
 void ADronePawn::Shoot()
 {
-	if (!ProjectileClass) return;
+    if (!ProjectileClass || !bCanShoot || CurrentAmmo <= 0) return;
 
-	FVector SpawnLocation = CameraComponent->GetComponentLocation() + CameraComponent->GetForwardVector() * 100.0f;
-	FRotator SpawnRotation = CameraComponent->GetComponentRotation();
+    bCanShoot = false;
+    --CurrentAmmo;
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
+    FVector SpawnLocation = CameraComponent->GetComponentLocation() + CameraComponent->GetForwardVector() * 100.0f;
+    FRotator SpawnRotation = CameraComponent->GetComponentRotation();
 
-	GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = this;
+
+    GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+
+    GetWorldTimerManager().SetTimer(FireCooldownTimer, this, &ADronePawn::ResetShoot, FireCooldown, false);
+}
+
+void ADronePawn::ResetShoot()
+{
+    bCanShoot = true;
 }
 
 // === Death Handling ===

@@ -42,6 +42,8 @@ protected:
 	UFUNCTION()
 	void Shoot();
 
+	void ResetShoot();
+
 	// === Health ===
 	UFUNCTION()
 	void HandleDeath();
@@ -69,4 +71,14 @@ protected:
 	// === Shooting ===
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TSubclassOf<AProjectile> ProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	int32 MaxAmmo = 15;
+	int32 CurrentAmmo = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float FireCooldown = 3.f;
+
+	bool bCanShoot = true;
+	FTimerHandle FireCooldownTimer;
 };
