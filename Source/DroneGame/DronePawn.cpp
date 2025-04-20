@@ -111,7 +111,7 @@ void ADronePawn::LookUp(float Value)
     {
         FRotator Rotation = Controller->GetControlRotation();
         float CurrentPitch = FRotator::NormalizeAxis(Rotation.Pitch);
-        float NewPitch = FMath::Clamp(CurrentPitch + Value, -80.f, -70.f);
+        float NewPitch = FMath::Clamp(CurrentPitch + Value, -80.f, -30.f);
         Rotation.Pitch = NewPitch;
         Controller->SetControlRotation(Rotation);
     }
