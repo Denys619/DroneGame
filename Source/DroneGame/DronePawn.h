@@ -9,6 +9,7 @@
 class UCameraComponent;
 class UFloatingPawnMovement;
 class AProjectile;
+class USphereComponent; 
 
 UCLASS()
 class DRONEGAME_API ADronePawn : public APawn
@@ -51,6 +52,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UFloatingPawnMovement* MovementComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	USphereComponent* CollisionComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UHealthComponent* HealthComponent;

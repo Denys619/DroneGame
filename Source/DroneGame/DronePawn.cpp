@@ -3,6 +3,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Components/InputComponent.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // === Constructor ===
@@ -10,15 +11,18 @@ ADronePawn::ADronePawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Root
-	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	// --- Collision root ---
+    CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
+    CollisionComponent->InitSphereRadius(45.f);
+    CollisionComponent->SetCollisionProfileName(TEXT("Pawn"));
+    CollisionComponent->SetGenerateOverlapEvents(true);
+    RootComponent = CollisionComponent;
 
 	// Components
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	CameraComponent->SetupAttachment(RootComponent);
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+    CameraComponent->SetupAttachment(RootComponent);
 
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
-
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
 	// Auto Possess
