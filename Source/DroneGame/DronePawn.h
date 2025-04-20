@@ -27,6 +27,9 @@ public:
 	// === Input ===
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable)
+    float GetReloadProgress() const;
+
 protected:
 	// === BeginPlay ===
 	virtual void BeginPlay() override;
@@ -67,6 +70,11 @@ protected:
 
 	UPROPERTY()
 	UUserWidget* HealthWidget;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> ReloadBarClass;
+
+	UUserWidget* ReloadBarWidget = nullptr;
 
 	// === Shooting ===
 	UPROPERTY(EditAnywhere, Category = "Combat")

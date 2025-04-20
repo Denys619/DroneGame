@@ -57,6 +57,15 @@ void ADronePawn::BeginPlay()
 			HealthWidget->AddToViewport();
 		}
 	}
+
+	if (ReloadBarClass)
+    {
+        ReloadBarWidget = CreateWidget<UUserWidget>(GetWorld(), ReloadBarClass);
+        if (ReloadBarWidget)
+        {
+            ReloadBarWidget->AddToViewport();
+        }
+    }
 }
 
 // === Tick ===
@@ -150,6 +159,14 @@ void ADronePawn::Shoot()
 void ADronePawn::ResetShoot()
 {
     bCanShoot = true;
+}
+
+float ADronePawn::GetReloadProgress() const
+{
+    if (!GetWorldTimerManager().IsTimerActive(FireCooldownTimer)) return 1.0f;
+
+    float Remaining = GetWorldTimerManager().GetTimerRemaining(FireCooldownTimer);
+    return 1.0f - (Remaining / FireCooldown);
 }
 
 // === Death Handling ===
