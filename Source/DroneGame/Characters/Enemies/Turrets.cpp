@@ -34,7 +34,7 @@ void ATurrets::BeginPlay()
 
 	if (HealthComponent)
 	{
-		HealthComponent->OnDeath.AddDynamic(this, &ATurrets::HandleDeath); // ✅ підписка на смерть
+		HealthComponent->OnDeath.AddDynamic(this, &ATurrets::HandleDeath);
 	}
 	
 	TargetActor = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
@@ -49,8 +49,19 @@ void ATurrets::Tick(float DeltaTime)
 
 	if (TargetActor && DetectionSphere->IsOverlappingActor(TargetActor))
 	{
-		FRotator LookAtRotation = (TargetActor->GetActorLocation() - GetActorLocation()).Rotation();
-		SetActorRotation(FRotator(0.f, LookAtRotation.Yaw, 0.f));
+
+		FVector Direction = TargetActor->GetActorLocation() - GetActorLocation();
+		FRotator TargetRotation = Direction.Rotation();
+
+		FRotator CurrentRotation = GetActorRotation();
+
+		float RotationSpeed = 2.0f;
+		FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, RotationSpeed);
+
+		SmoothRotation.Pitch = 0.f;
+		SmoothRotation.Roll = 0.f;
+
+		SetActorRotation(SmoothRotation);
 	}
 }
 
