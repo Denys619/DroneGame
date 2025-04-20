@@ -2,6 +2,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/HealthComponent.h"
+#include "Characters/Enemies/Turrets.h"
 
 AProjectile::AProjectile()
 {
@@ -58,6 +59,14 @@ void AProjectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
                             bool bFromSweep, const FHitResult& SweepResult)
 {
     if (!OtherActor || OtherActor == GetOwner()) return;
+
+	if (ATurrets* Turret = Cast<ATurrets>(OtherActor))
+	{
+		if (OtherComp && OtherComp->GetName() == "TurretMesh")
+		{
+			Turret->FlashOnHit();
+		}
+	}
 
     if (OtherComp && OtherComp->GetName().Contains("DetectionSphere"))
     {

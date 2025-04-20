@@ -21,6 +21,9 @@ class DRONEGAME_API ATurrets : public AActor
 public:	
 	ATurrets();
 
+	// === Flash On Hit ===
+	void FlashOnHit();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -32,7 +35,12 @@ protected:
 
 	FTimerHandle ShootingTimer;
 
-private:
+	private:
+	UMaterialInstanceDynamic* DynamicMaterial = nullptr;
+	FTimerHandle FlashTimer;
+
+	FLinearColor OriginalColor = FLinearColor::White;
+	
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* BaseMesh;
 

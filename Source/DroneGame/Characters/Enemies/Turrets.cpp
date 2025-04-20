@@ -4,6 +4,7 @@
 #include "Turrets.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "../../Components/HealthComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -21,7 +22,7 @@ ATurrets::ATurrets()
 
 	DetectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DetectionSphere"));
 	DetectionSphere->SetupAttachment(RootComponent);
-	DetectionSphere->SetSphereRadius(1200.f);
+	DetectionSphere->SetSphereRadius(2000.f);
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
@@ -34,9 +35,16 @@ void ATurrets::BeginPlay()
 
 	if (HealthComponent)
 	{
-		HealthComponent->OnDeath.AddDynamic(this, &ATurrets::HandleDeath); // ✅ підписка на смерть
+		HealthComponent->OnDeath.AddDynamic(this, &ATurrets::HandleDeath);
 	}
 	
+	if (UStaticMeshComponent* FoundMesh = Cast<UStaticMeshComponent>(GetDefaultSubobjectByName(TEXT("TurretMesh"))))
+	{
+		DynamicMaterial = UMaterialInstanceDynamic::Create(FoundMesh->GetMaterial(0), this);
+		FoundMesh->SetMaterial(0, DynamicMaterial);
+		OriginalColor = DynamicMaterial->K2_GetVectorParameterValue(FName("BaseColor"));
+	}
+
 	TargetActor = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
 	GetWorldTimerManager().SetTimer(ShootingTimer, this, &ATurrets::ShootAtTarget, FireRate, true);
@@ -49,8 +57,19 @@ void ATurrets::Tick(float DeltaTime)
 
 	if (TargetActor && DetectionSphere->IsOverlappingActor(TargetActor))
 	{
-		FRotator LookAtRotation = (TargetActor->GetActorLocation() - GetActorLocation()).Rotation();
-		SetActorRotation(FRotator(0.f, LookAtRotation.Yaw, 0.f));
+
+		FVector Direction = TargetActor->GetActorLocation() - GetActorLocation();
+		FRotator TargetRotation = Direction.Rotation();
+
+		FRotator CurrentRotation = GetActorRotation();
+
+		float RotationSpeed = 2.0f;
+		FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, RotationSpeed);
+
+		SmoothRotation.Pitch = 0.f;
+		SmoothRotation.Roll = 0.f;
+
+		SetActorRotation(SmoothRotation);
 	}
 }
 
@@ -74,6 +93,21 @@ void ATurrets::ShootAtTarget()
 			Projectile->GetMovementComponent()->Velocity = Direction * 1000.f;
 		}
 	}
+}
+
+void ATurrets::FlashOnHit()
+{
+	if (!DynamicMaterial) return;
+
+	DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), FLinearColor::Red);
+
+	GetWorldTimerManager().SetTimer(FlashTimer, [this]()
+	{
+		if (DynamicMaterial)
+		{
+			DynamicMaterial->SetVectorParameterValue(FName("BaseColor"), OriginalColor);
+		}
+	}, 0.15f, false);
 }
 
 void ATurrets::HandleDeath()
