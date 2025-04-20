@@ -88,6 +88,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	int32 MaxAmmo = 15;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	int32 CurrentAmmo = 0;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
