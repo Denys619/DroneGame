@@ -29,6 +29,8 @@ public:
     UPROPERTY(BlueprintAssignable)
     FOnDeathDelegate OnDeath;
 
+	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

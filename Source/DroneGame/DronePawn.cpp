@@ -46,6 +46,15 @@ void ADronePawn::BeginPlay()
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &ADronePawn::HandleDeath);
 	}
+
+	if (HealthWidgetClass)
+	{
+		HealthWidget = CreateWidget<UUserWidget>(GetWorld(), HealthWidgetClass);
+		if (HealthWidget)
+		{
+			HealthWidget->AddToViewport();
+		}
+	}
 }
 
 // === Tick ===

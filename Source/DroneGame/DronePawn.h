@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Components/HealthComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "DronePawn.generated.h"
 
 class UCameraComponent;
@@ -58,6 +59,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UHealthComponent* HealthComponent;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> HealthWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* HealthWidget;
 
 	// === Shooting ===
 	UPROPERTY(EditAnywhere, Category = "Combat")
