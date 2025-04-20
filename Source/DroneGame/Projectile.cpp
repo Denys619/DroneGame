@@ -51,16 +51,18 @@ void AProjectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
                             UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
                             bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!OtherActor || OtherActor == GetOwner()) return;
+    if (!OtherActor || OtherActor == GetOwner()) return;
 
-	UActorComponent* HitComp = OtherActor->GetComponentByClass(UHealthComponent::StaticClass());
-	UHealthComponent* HealthComp = Cast<UHealthComponent>(HitComp);
+    if (OtherComp && OtherComp->GetName().Contains("DetectionSphere"))
+    {
+        return;
+    }
 
-	if (HealthComp)
-	{
-		HealthComp->TakeDamage(DamageAmount);
-	}
+    if (UHealthComponent* HealthComp = OtherActor->FindComponentByClass<UHealthComponent>())
+    {
+        HealthComp->TakeDamage(DamageAmount);
+    }
+  
 
-	Destroy();
+    Destroy();
 }
-
