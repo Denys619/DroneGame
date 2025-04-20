@@ -66,6 +66,24 @@ void ADronePawn::BeginPlay()
             ReloadBarWidget->AddToViewport();
         }
     }
+
+	if (CrosshairClass)
+	{
+    	UUserWidget* CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairClass);
+    	if (CrosshairWidget)
+    	{
+        	CrosshairWidget->AddToViewport();
+    	}
+	}
+
+	if (VignetteClass)
+	{
+    	UUserWidget* VignetteWidget = CreateWidget<UUserWidget>(GetWorld(), VignetteClass);
+    	if (VignetteWidget)
+    	{
+        	VignetteWidget->AddToViewport();
+    	}
+	}
 }
 
 // === Tick ===

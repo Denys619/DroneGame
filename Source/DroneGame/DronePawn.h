@@ -76,6 +76,12 @@ protected:
 
 	UUserWidget* ReloadBarWidget = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> CrosshairClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> VignetteClass;
+
 	// === Shooting ===
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TSubclassOf<AProjectile> ProjectileClass;
