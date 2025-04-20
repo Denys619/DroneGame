@@ -15,7 +15,10 @@ ADronePawn::ADronePawn()
     CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
     CollisionComponent->InitSphereRadius(45.f);
     CollisionComponent->SetCollisionProfileName(TEXT("Pawn"));
-    CollisionComponent->SetGenerateOverlapEvents(true);
+    CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	CollisionComponent->SetCollisionObjectType(ECC_Pawn);
+	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CollisionComponent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
     RootComponent = CollisionComponent;
 
 	// Components
