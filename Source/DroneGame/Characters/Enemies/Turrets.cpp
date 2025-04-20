@@ -4,6 +4,7 @@
 #include "Turrets.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "../../Components/HealthComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "../../Projectile.h"
@@ -22,12 +23,19 @@ ATurrets::ATurrets()
 	DetectionSphere->SetupAttachment(RootComponent);
 	DetectionSphere->SetSphereRadius(1200.f);
 
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+
 }
 
 // Called when the game starts or when spawned
 void ATurrets::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (HealthComponent)
+	{
+		HealthComponent->OnDeath.AddDynamic(this, &ATurrets::HandleDeath); // ✅ підписка на смерть
+	}
 	
 	TargetActor = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
@@ -66,4 +74,10 @@ void ATurrets::ShootAtTarget()
 			Projectile->GetMovementComponent()->Velocity = Direction * 1000.f;
 		}
 	}
+}
+
+void ATurrets::HandleDeath()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Turret has been destroyed!"));
+	Destroy();
 }

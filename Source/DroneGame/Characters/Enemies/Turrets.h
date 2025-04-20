@@ -10,6 +10,8 @@ class UStaticMeshComponent;
 class USphereComponent;
 class UProjectileMovementComponent;
 class AProjectile;
+class UHealthComponent;
+
 
 UCLASS()
 class DRONEGAME_API ATurrets : public AActor
@@ -17,20 +19,18 @@ class DRONEGAME_API ATurrets : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ATurrets();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 	void ShootAtTarget();
 
-	FTimerHandle ShootingTimer;
+	UFUNCTION()
+	void HandleDeath();
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	FTimerHandle ShootingTimer;
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -38,6 +38,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* DetectionSphere;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UHealthComponent* HealthComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TSubclassOf<AProjectile> ProjectileClass;
