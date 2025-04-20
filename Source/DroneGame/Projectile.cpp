@@ -37,9 +37,15 @@ AProjectile::AProjectile()
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	// Bind overlap
+
+	if (AActor* MyOwner = GetOwner())
+	{
+		MeshComponent->IgnoreActorWhenMoving(MyOwner, true);
+	}
+
+	// Bind overlap and hit
 	MeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnOverlap);
+	MeshComponent->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
 }
 
 void AProjectile::Tick(float DeltaTime)
@@ -62,9 +68,20 @@ void AProjectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
     {
         HealthComp->TakeDamage(DamageAmount);
     }
-  
 
     Destroy();
+}
+
+void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
+                        UPrimitiveComponent* OtherComp, FVector NormalImpulse,
+                        const FHitResult& Hit)
+{
+	if (!OtherActor || OtherActor == GetOwner()) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("Projectile hit actor: %s"), *OtherActor->GetName());
+
+	// Destroy if we hit anything (optionally check tags or collision channels)
+	Destroy();
 }
 
 void AProjectile::SetGravityEnabled(bool bEnableGravity)

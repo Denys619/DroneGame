@@ -60,7 +60,7 @@ void ATurrets::ShootAtTarget()
 
 	if (DetectionSphere->IsOverlappingActor(TargetActor))
 	{
-		FVector SpawnLocation = BaseMesh->GetComponentLocation() + BaseMesh->GetForwardVector() * 100.f;
+		FVector SpawnLocation = BaseMesh->GetComponentLocation() + BaseMesh->GetForwardVector() * 100.f + FVector(0.f, 0.f, 200.f);
 		FVector Direction = (TargetActor->GetActorLocation() - SpawnLocation).GetSafeNormal();
 		FRotator SpawnRotation = Direction.Rotation();
 
