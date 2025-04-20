@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,8 +8,10 @@
 
 class UCameraComponent;
 class UFloatingPawnMovement;
+class USphereComponent;
+class UHealthComponent;
 class AProjectile;
-class USphereComponent; 
+class UUserWidget;
 
 UCLASS()
 class DRONEGAME_API ADronePawn : public APawn
@@ -27,14 +28,19 @@ public:
 	// === Input ===
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// === Reload UI ===
 	UFUNCTION(BlueprintCallable)
-    float GetReloadProgress() const;
+	float GetReloadProgress() const;
+
+	// === Combat ===
+	UFUNCTION(BlueprintCallable)
+	void AddAmmo(int32 Amount);
 
 protected:
-	// === BeginPlay ===
+	// === Lifecycle ===
 	virtual void BeginPlay() override;
 
-	// === Movement Input ===
+	// === Movement ===
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void MoveUp(float Value);
@@ -47,7 +53,7 @@ protected:
 
 	void ResetShoot();
 
-	// === Health ===
+	// === Death ===
 	UFUNCTION()
 	void HandleDeath();
 
@@ -65,24 +71,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UHealthComponent* HealthComponent;
 
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<UUserWidget> HealthWidgetClass;
-
-	UPROPERTY()
-	UUserWidget* HealthWidget;
-
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<UUserWidget> ReloadBarClass;
-
-	UUserWidget* ReloadBarWidget = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UUserWidget> CrosshairClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UUserWidget> VignetteClass;
-
-	// === Shooting ===
+	// === Combat ===
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TSubclassOf<AProjectile> ProjectileClass;
 
@@ -97,4 +86,23 @@ protected:
 
 	bool bCanShoot = true;
 	FTimerHandle FireCooldownTimer;
+
+	// === UI ===
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> HealthWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* HealthWidget;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> ReloadBarClass;
+
+	UPROPERTY()
+	UUserWidget* ReloadBarWidget = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> CrosshairClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> VignetteClass;
 };

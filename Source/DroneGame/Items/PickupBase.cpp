@@ -4,43 +4,73 @@
 #include "../DronePawn.h"
 #include "../Components/HealthComponent.h"
 
+// === Constructor ===
 APickupBase::APickupBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	// Box Collision
+	// === Collision ===
 	CollisionComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision"));
 	CollisionComponent->InitBoxExtent(FVector(40.f));
 	CollisionComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	CollisionComponent->SetGenerateOverlapEvents(true);
 	RootComponent = CollisionComponent;
 
-	// Mesh
+	// === Mesh ===
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	MeshComponent->SetupAttachment(RootComponent);
 
-	// Overlap binding
+	// === Bind Overlap Event ===
 	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &APickupBase::OnOverlap);
 }
 
+// === BeginPlay ===
 void APickupBase::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void APickupBase::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-                            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-                            bool bFromSweep, const FHitResult& SweepResult)
+// === Overlap Handler ===
+void APickupBase::OnOverlap(
+	UPrimitiveComponent* OverlappedComp,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult
+)
 {
-	if (OtherActor && OtherActor != this)
+	if (!OtherActor || OtherActor == this)
 	{
-		if (UHealthComponent* Health = OtherActor->FindComponentByClass<UHealthComponent>())
+		return;
+	}
+
+	switch (PickupType)
+	{
+		case EPickupType::Health:
 		{
-			if (!Health->IsDead())
+			if (UHealthComponent* Health = OtherActor->FindComponentByClass<UHealthComponent>())
 			{
-				Health->Heal(HealAmount);
+				if (!Health->IsDead())
+				{
+					Health->Heal(HealAmount);
+					Destroy();
+				}
+			}
+			break;
+		}
+
+		case EPickupType::Ammo:
+		{
+			if (ADronePawn* Drone = Cast<ADronePawn>(OtherActor))
+			{
+				Drone->AddAmmo(AmmoAmount);
 				Destroy();
 			}
+			break;
 		}
+
+		default:
+			break;
 	}
 }

@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Turrets.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
@@ -11,12 +8,12 @@
 #include "../../Projectile.h"
 #include "TimerManager.h"
 
-// Sets default values
+// === Constructor ===
 ATurrets::ATurrets()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// === Components Setup ===
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh"));
 	RootComponent = BaseMesh;
 
@@ -25,19 +22,20 @@ ATurrets::ATurrets()
 	DetectionSphere->SetSphereRadius(2000.f);
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
-
 }
 
-// Called when the game starts or when spawned
+// === BeginPlay ===
 void ATurrets::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// === Death Binding ===
 	if (HealthComponent)
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &ATurrets::HandleDeath);
 	}
-	
+
+	// === Dynamic Material Setup ===
 	if (UStaticMeshComponent* FoundMesh = Cast<UStaticMeshComponent>(GetDefaultSubobjectByName(TEXT("TurretMesh"))))
 	{
 		DynamicMaterial = UMaterialInstanceDynamic::Create(FoundMesh->GetMaterial(0), this);
@@ -45,27 +43,25 @@ void ATurrets::BeginPlay()
 		OriginalColor = DynamicMaterial->K2_GetVectorParameterValue(FName("BaseColor"));
 	}
 
+	// === Get Target Player ===
 	TargetActor = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
+	// === Setup Shooting Timer ===
 	GetWorldTimerManager().SetTimer(ShootingTimer, this, &ATurrets::ShootAtTarget, FireRate, true);
 }
 
-// Called every frame
+// === Tick ===
 void ATurrets::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// === Rotate Toward Target ===
 	if (TargetActor && DetectionSphere->IsOverlappingActor(TargetActor))
 	{
-
 		FVector Direction = TargetActor->GetActorLocation() - GetActorLocation();
 		FRotator TargetRotation = Direction.Rotation();
 
-		FRotator CurrentRotation = GetActorRotation();
-
-		float RotationSpeed = 2.0f;
-		FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, RotationSpeed);
-
+		FRotator SmoothRotation = FMath::RInterpTo(GetActorRotation(), TargetRotation, DeltaTime, 2.0f);
 		SmoothRotation.Pitch = 0.f;
 		SmoothRotation.Roll = 0.f;
 
@@ -73,6 +69,7 @@ void ATurrets::Tick(float DeltaTime)
 	}
 }
 
+// === Shooting Logic ===
 void ATurrets::ShootAtTarget()
 {
 	if (!TargetActor || !ProjectileClass) return;
@@ -87,7 +84,6 @@ void ATurrets::ShootAtTarget()
 		SpawnParams.Owner = this;
 
 		AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
-
 		if (Projectile && Projectile->GetMovementComponent())
 		{
 			Projectile->GetMovementComponent()->Velocity = Direction * 1000.f;
@@ -95,6 +91,7 @@ void ATurrets::ShootAtTarget()
 	}
 }
 
+// === Flash Feedback on Hit ===
 void ATurrets::FlashOnHit()
 {
 	if (!DynamicMaterial) return;
@@ -110,6 +107,7 @@ void ATurrets::FlashOnHit()
 	}, 0.15f, false);
 }
 
+// === Handle Death ===
 void ATurrets::HandleDeath()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Turret has been destroyed!"));

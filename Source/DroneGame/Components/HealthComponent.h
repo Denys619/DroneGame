@@ -1,46 +1,46 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 
+// === Delegates ===
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathDelegate);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class DRONEGAME_API UHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
-	// Sets default values for this component's properties
+public:
+	// === Constructor ===
 	UHealthComponent();
 
+	// === Health Interface ===
 	void TakeDamage(float DamageAmount);
-    void Heal(float HealAmount);
+	void Heal(float HealAmount);
 
-    UFUNCTION(BlueprintCallable)
-    float GetHealth() const { return Health; }
+	UFUNCTION(BlueprintCallable)
+	float GetHealth() const { return Health; }
 
-    UFUNCTION(BlueprintCallable)
-    bool IsDead() const { return Health <= 0.f; }
-
-    UPROPERTY(BlueprintAssignable)
-    FOnDeathDelegate OnDeath;
+	UFUNCTION(BlueprintCallable)
+	bool IsDead() const { return Health <= 0.f; }
 
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 
+	// === Events ===
+	UPROPERTY(BlueprintAssignable, Category = "Health")
+	FOnDeathDelegate OnDeath;
+
 protected:
-	// Called when the game starts
+	// === Lifecycle ===
 	virtual void BeginPlay() override;
 
-public:	
-	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+protected:
+	// === Properties ===
+	UPROPERTY(EditAnywhere, Category = "Health")
+	float MaxHealth = 100.f;
 
-	UPROPERTY(EditAnywhere, Category="Health")
-    float MaxHealth = 100.f;
-
-    float Health;
-		
+	UPROPERTY(VisibleAnywhere, Category = "Health")
+	float Health = 0.f;
 };

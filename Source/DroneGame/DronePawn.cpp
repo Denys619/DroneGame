@@ -11,27 +11,27 @@ ADronePawn::ADronePawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// --- Collision root ---
-    CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
-    CollisionComponent->InitSphereRadius(45.f);
-    CollisionComponent->SetCollisionProfileName(TEXT("Pawn"));
-    CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	// === Collision ===
+	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
+	CollisionComponent->InitSphereRadius(45.f);
+	CollisionComponent->SetCollisionProfileName(TEXT("Pawn"));
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CollisionComponent->SetCollisionObjectType(ECC_Pawn);
 	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
-    RootComponent = CollisionComponent;
+	RootComponent = CollisionComponent;
 
-	// Components
+	// === Components ===
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-    CameraComponent->SetupAttachment(RootComponent);
+	CameraComponent->SetupAttachment(RootComponent);
 
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
-	// Auto Possess
+	// === Possession ===
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
-	// Rotation
+	// === Rotation Settings ===
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationRoll = false;
@@ -49,40 +49,29 @@ void ADronePawn::BeginPlay()
 		HealthComponent->OnDeath.AddDynamic(this, &ADronePawn::HandleDeath);
 	}
 
+	// === UI Setup ===
 	if (HealthWidgetClass)
 	{
 		HealthWidget = CreateWidget<UUserWidget>(GetWorld(), HealthWidgetClass);
-		if (HealthWidget)
-		{
-			HealthWidget->AddToViewport();
-		}
+		if (HealthWidget) HealthWidget->AddToViewport();
 	}
 
 	if (ReloadBarClass)
-    {
-        ReloadBarWidget = CreateWidget<UUserWidget>(GetWorld(), ReloadBarClass);
-        if (ReloadBarWidget)
-        {
-            ReloadBarWidget->AddToViewport();
-        }
-    }
+	{
+		ReloadBarWidget = CreateWidget<UUserWidget>(GetWorld(), ReloadBarClass);
+		if (ReloadBarWidget) ReloadBarWidget->AddToViewport();
+	}
 
 	if (CrosshairClass)
 	{
-    	UUserWidget* CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairClass);
-    	if (CrosshairWidget)
-    	{
-        	CrosshairWidget->AddToViewport();
-    	}
+		UUserWidget* CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairClass);
+		if (CrosshairWidget) CrosshairWidget->AddToViewport();
 	}
 
 	if (VignetteClass)
 	{
-    	UUserWidget* VignetteWidget = CreateWidget<UUserWidget>(GetWorld(), VignetteClass);
-    	if (VignetteWidget)
-    	{
-        	VignetteWidget->AddToViewport();
-    	}
+		UUserWidget* VignetteWidget = CreateWidget<UUserWidget>(GetWorld(), VignetteClass);
+		if (VignetteWidget) VignetteWidget->AddToViewport();
 	}
 }
 
@@ -155,46 +144,55 @@ void ADronePawn::LookUp(float Value)
 	}
 }
 
-// === Shooting ===
+// === Combat ===
 void ADronePawn::Shoot()
 {
-    if (!ProjectileClass || !bCanShoot || CurrentAmmo <= 0) return;
+	if (!ProjectileClass || !bCanShoot || CurrentAmmo <= 0) return;
 
-    FVector SpawnLocation = CameraComponent->GetComponentLocation() + CameraComponent->GetForwardVector() * 100.0f;
-    FRotator SpawnRotation = CameraComponent->GetComponentRotation();
+	FVector SpawnLocation = CameraComponent->GetComponentLocation() + CameraComponent->GetForwardVector() * 100.f;
+	FRotator SpawnRotation = CameraComponent->GetComponentRotation();
 
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.Owner = this;
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
 
 	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
-    if (Projectile)
-    {
-        Projectile->SetGravityEnabled(true);
-    }
+	if (Projectile)
+	{
+		Projectile->SetGravityEnabled(true);
+	}
 
+	--CurrentAmmo;
 	bCanShoot = false;
-    --CurrentAmmo;
 
-
-    GetWorldTimerManager().SetTimer(FireCooldownTimer, this, &ADronePawn::ResetShoot, FireCooldown, false);
+	GetWorldTimerManager().SetTimer(FireCooldownTimer, this, &ADronePawn::ResetShoot, FireCooldown, false);
 }
 
 void ADronePawn::ResetShoot()
 {
-    bCanShoot = true;
+	bCanShoot = true;
+}
+
+void ADronePawn::AddAmmo(int32 Amount)
+{
+	if (Amount <= 0 || CurrentAmmo >= MaxAmmo) return;
+
+	CurrentAmmo = FMath::Clamp(CurrentAmmo + Amount, 0, MaxAmmo);
 }
 
 float ADronePawn::GetReloadProgress() const
 {
-    if (!GetWorldTimerManager().IsTimerActive(FireCooldownTimer)) return 1.0f;
+	if (!GetWorldTimerManager().IsTimerActive(FireCooldownTimer))
+	{
+		return 1.0f;
+	}
 
-    float Remaining = GetWorldTimerManager().GetTimerRemaining(FireCooldownTimer);
-    return 1.0f - (Remaining / FireCooldown);
+	float Remaining = GetWorldTimerManager().GetTimerRemaining(FireCooldownTimer);
+	return 1.0f - (Remaining / FireCooldown);
 }
 
 // === Death Handling ===
 void ADronePawn::HandleDeath()
 {
-	// TODO: додати візуальний ефект, звук, анімацію (опціонально)
+	// TODO: Add VFX, sound, or animation
 	Destroy();
 }
