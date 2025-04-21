@@ -4,14 +4,12 @@
 
 https://github.com/user-attachments/assets/882c665e-f12f-4803-9982-138b4ca3c5ea
 
-> This video was created on a map that is not in the files of this repository, but will be added shortly
-
 ## Gameplay
 
 You control a small FPV-drone equipped with a front-facing camera and a limited number of explosive projectiles.  
 Your mission: destroy enemy turrets before they destroy you.
 
-## 🕹️ Controls
+### 🕹️ Controls**
 
 | Action         | Key / Mouse      |
 |----------------|------------------|
@@ -23,6 +21,17 @@ Your mission: destroy enemy turrets before they destroy you.
 | Descend        | C                |
 | Look Around    | Mouse Movement   |
 | Shoot          | Left Mouse Button|
+
+**The game contains pickups:**
+- 🧰 **Health Kit** - restores part of the drone's health.
+
+![Записування з екрана 2025-04-21 191521](https://github.com/user-attachments/assets/b9cd4b62-1928-45b7-8d21-990afe9773d4)
+  
+- 🔫 **Ammo Crate** - replenishes the supply of shells.
+
+Pickups are scattered around the map - look for them to survive longer and fight turrets more effectively.
+
+![Записування з екрана 2025-04-21 191346](https://github.com/user-attachments/assets/672f71c3-fddb-4716-8e91-84c54030d1ac)
 
 ## Features
 
