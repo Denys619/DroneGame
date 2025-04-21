@@ -25,8 +25,13 @@ ADronePawn::ADronePawn()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(RootComponent);
 
-	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+
+	// === Movement Component ===
+	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
+	MovementComponent->MaxSpeed = 1200.f;
+	MovementComponent->Acceleration = 2200.f;
+	MovementComponent->Deceleration = 2500.f;
 
 	// === Possession ===
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
