@@ -2,6 +2,8 @@
 
 **FPV Drone Game** is a mini-game created on **Unreal Engine 5** using **C++**, where the player controls a drone in FPV style, shoots at turrets, avoids attacks, picks up first aid kits and ammo, and monitors health through the HUD.
 
+> ⚠️ Make shure you have installed Git LFS, before cloning this repository (There is large file)
+
 https://github.com/user-attachments/assets/882c665e-f12f-4803-9982-138b4ca3c5ea
 
 ## Gameplay
